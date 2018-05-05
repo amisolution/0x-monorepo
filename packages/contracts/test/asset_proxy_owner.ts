@@ -5,14 +5,14 @@ import * as chai from 'chai';
 import * as _ from 'lodash';
 import * as Web3 from 'web3';
 
-import { AuthorizableContract } from '../src/contract_wrappers/generated/authorizable';
 import {
+    AssetProxyOwnerContract,
     AssetProxyRegistrationContractEventArgs,
     ExecutionContractEventArgs,
     ExecutionFailureContractEventArgs,
-    MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressContract,
     SubmissionContractEventArgs,
-} from '../src/contract_wrappers/generated/multi_sig_wallet_with_time_lock_except_remove_authorized_address';
+} from '../src/contract_wrappers/generated/asset_proxy_owner';
+import { MixinAuthorizableContract } from '../src/contract_wrappers/generated/mixin_authorizable';
 import { artifacts } from '../src/utils/artifacts';
 import { chaiSetup } from '../src/utils/chai_setup';
 import { constants } from '../src/utils/constants';
@@ -24,37 +24,37 @@ const expect = chai.expect;
 const blockchainLifecycle = new BlockchainLifecycle(web3Wrapper);
 const zeroEx = new ZeroEx(provider, { networkId: constants.TESTRPC_NETWORK_ID });
 
-describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
+describe('AssetProxyOwner', () => {
     let owners: string[];
     let authorized: string;
     const requiredApprovals = new BigNumber(2);
     const SECONDS_TIME_LOCKED = new BigNumber(1000000);
 
-    let erc20Proxy: AuthorizableContract;
-    let erc721Proxy: AuthorizableContract;
-    let multiSig: MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressContract;
+    let erc20Proxy: MixinAuthorizableContract;
+    let erc721Proxy: MixinAuthorizableContract;
+    let multiSig: AssetProxyOwnerContract;
     let multiSigWrapper: MultiSigWrapper;
 
     before(async () => {
         const accounts = await web3Wrapper.getAvailableAddressesAsync();
         owners = [accounts[0], accounts[1]];
         const initialOwner = (authorized = accounts[0]);
-        erc20Proxy = await AuthorizableContract.deployFrom0xArtifactAsync(artifacts.Authorizable, provider, txDefaults);
-        erc721Proxy = await AuthorizableContract.deployFrom0xArtifactAsync(
-            artifacts.Authorizable,
+        erc20Proxy = await MixinAuthorizableContract.deployFrom0xArtifactAsync(artifacts.MixinAuthorizable, provider, txDefaults);
+        erc721Proxy = await MixinAuthorizableContract.deployFrom0xArtifactAsync(
+            artifacts.MixinAuthorizable,
             provider,
             txDefaults,
         );
         const defaultAssetProxyContractAddresses: string[] = [];
-        multiSig = await MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressContract.deployFrom0xArtifactAsync(
-            artifacts.MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,
+        multiSig = await AssetProxyOwnerContract.deployFrom0xArtifactAsync(
+            artifacts.AssetProxyOwner,
             provider,
             txDefaults,
             owners,
             requiredApprovals,
             SECONDS_TIME_LOCKED,
             defaultAssetProxyContractAddresses,
-        );
+        ]);
         multiSigWrapper = new MultiSigWrapper(multiSig, zeroEx);
         await erc20Proxy.transferOwnership.sendTransactionAsync(multiSig.address, { from: initialOwner });
         await erc721Proxy.transferOwnership.sendTransactionAsync(multiSig.address, { from: initialOwner });
@@ -69,8 +69,8 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
     describe('constructor', () => {
         it('should register passed in assetProxyContracts', async () => {
             const assetProxyContractAddresses = [erc20Proxy.address, erc721Proxy.address];
-            const newMultiSig = await MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressContract.deployFrom0xArtifactAsync(
-                artifacts.MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,
+            const newMultiSig = await AssetProxyOwnerContract.deployFrom0xArtifactAsync(
+                artifacts.AssetProxyOwner,
                 provider,
                 txDefaults,
                 owners,
@@ -86,8 +86,8 @@ describe('MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress', () => {
         it('should throw if a null address is included in assetProxyContracts', async () => {
             const assetProxyContractAddresses = [erc20Proxy.address, ZeroEx.NULL_ADDRESS];
             expect(
-                MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddressContract.deployFrom0xArtifactAsync(
-                    artifacts.MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress,
+                AssetProxyOwnerContract.deployFrom0xArtifactAsync(
+                    artifacts.AssetProxyOwner,
                     provider,
                     txDefaults,
                     owners,
