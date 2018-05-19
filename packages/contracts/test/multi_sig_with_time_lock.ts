@@ -106,9 +106,9 @@ describe('MultiSigWalletWithTimeLock', () => {
             });
         });
         describe('initially time-locked', async () => {
+            let txId: BigNumber;
+            const newSecondsTimeLocked = new BigNumber(0);
             before('deploy a wallet, submit transaction to change timelock, and confirm the transaction', async () => {
-                let txId: BigNumber;
-                const newSecondsTimeLocked = new BigNumber(0);
                 multiSig = await MultiSigWalletWithTimeLockContract.deployFrom0xArtifactAsync(
                     artifacts.MultiSigWalletWithTimeLock,
                     provider,

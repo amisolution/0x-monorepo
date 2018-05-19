@@ -3,7 +3,7 @@
     "name": "contracts",
     "version": "2.1.28",
     "engines": {
-        "node" : ">=6.12"
+        "node": ">=6.12"
     },
     "description": "Smart contract components of 0x protocol",
     "main": "index.js",
@@ -12,7 +12,7 @@
     },
     "scripts": {
         "watch": "tsc -w",
-        "prebuild": "run-s clean copy_artifacts generate_contract_wrappers",
+        "prebuild": "run-s clean compile copy_artifacts generate_contract_wrappers",
         "copy_artifacts": "copyfiles -u 4 '../migrations/artifacts/2.0.0/**/*' ./lib/src/artifacts;",
         "build": "tsc",
         "test": "run-s build run_mocha",
@@ -20,7 +20,8 @@
         "run_mocha": "mocha 'lib/test/**/*.js' --timeout 100000 --bail --exit",
         "compile": "sol-compiler",
         "clean": "shx rm -rf lib src/contract_wrappers/generated",
-        "generate_contract_wrappers": "abi-gen --abis  ${npm_package_config_abis} --template ../contract_templates/contract.handlebars --partials '../contract_templates/partials/**/*.handlebars' --output src/contract_wrappers/generated --backend ethers && prettier --write 'src/contract_wrappers/generated/**.ts'",
+        "generate_contract_wrappers":
+            "abi-gen --abis  ${npm_package_config_abis} --template ../contract_templates/contract.handlebars --partials '../contract_templates/partials/**/*.handlebars' --output src/contract_wrappers/generated --backend ethers && prettier --write 'src/contract_wrappers/generated/**.ts'",
         "lint": "tslint --project .",
         "coverage:report:text": "istanbul report text",
         "coverage:report:html": "istanbul report html && open coverage/index.html",
