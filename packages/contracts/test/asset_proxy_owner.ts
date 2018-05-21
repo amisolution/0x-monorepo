@@ -27,7 +27,7 @@ const zeroEx = new ZeroEx(provider, { networkId: constants.TESTRPC_NETWORK_ID })
 describe('AssetProxyOwner', () => {
     let owners: string[];
     let authorized: string;
-    const requiredApprovals = new BigNumber(2);
+    const REQUIRED_APPROVALS = new BigNumber(2);
     const SECONDS_TIME_LOCKED = new BigNumber(1000000);
 
     let erc20Proxy: MixinAuthorizableContract;
@@ -55,7 +55,7 @@ describe('AssetProxyOwner', () => {
             provider,
             txDefaults,
             owners,
-            requiredApprovals,
+            REQUIRED_APPROVALS,
             SECONDS_TIME_LOCKED,
             defaultAssetProxyContractAddresses,
         );
@@ -78,7 +78,7 @@ describe('AssetProxyOwner', () => {
                 provider,
                 txDefaults,
                 owners,
-                requiredApprovals,
+                REQUIRED_APPROVALS,
                 SECONDS_TIME_LOCKED,
                 assetProxyContractAddresses,
             );
@@ -95,7 +95,7 @@ describe('AssetProxyOwner', () => {
                     provider,
                     txDefaults,
                     owners,
-                    requiredApprovals,
+                    REQUIRED_APPROVALS,
                     SECONDS_TIME_LOCKED,
                     assetProxyContractAddresses,
                 ),
